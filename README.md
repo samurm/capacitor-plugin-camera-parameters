@@ -13,24 +13,24 @@ npx cap sync
 
 <docgen-index>
 
-* [`echo(...)`](#echo)
+* [`getIntrinsicParameters(...)`](#getIntrinsicParameters)
 
 </docgen-index>
 
 <docgen-api>
 <!--Update the source file JSDoc comments and rerun docgen to update the docs below-->
 
-### echo(...)
+### getIntrinsicParameters(...)
 
 ```typescript
-echo(options: { value: string; }) => Promise<{ value: string; }>
+getIntrinsicParameters() => Promise<IntrinsicParameters>
 ```
 
 | Param         | Type                            |
 | ------------- | ------------------------------- |
-| **`options`** | <code>{ value: string; }</code> |
+| **`       `** | <code>IntrinsicParameters</code> |
 
-**Returns:** <code>Promise&lt;{ value: string; }&gt;</code>
+**Returns:** <code>Promise&lt;IntrinsicParameters&gt;</code>
 
 --------------------
 
