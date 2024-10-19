@@ -1,0 +1,7 @@
+{
+  "name": "example-camera-parameters",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "vue-vite"
+}
