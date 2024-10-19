@@ -34,7 +34,7 @@ Promise&lt;{
   principalPointX: number;
   principalPointY: number;
 }
-&gt;</code>
+&gt;</pre>
 
 --------------------
 
