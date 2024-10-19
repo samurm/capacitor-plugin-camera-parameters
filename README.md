@@ -26,12 +26,14 @@ npx cap sync
 getIntrinsicParameters() => Promise<IntrinsicParameters>
 ```
 
-**Returns:** <code>Promise&lt;{ 
+**Returns:** <code>
+Promise&lt;{ 
   focalLength: number;
   sensorWidth: number;
   sensorHeight: number;
   principalPointX: number;
-  principalPointY: number;}
+  principalPointY: number;
+}
 &gt;</code>
 
 --------------------
