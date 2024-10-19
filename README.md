@@ -27,15 +27,14 @@ getIntrinsicParameters() => Promise<IntrinsicParameters>
 ```
 
 **Returns:**
-<pre>
+<code>
 Promise&lt;{ 
-&ensp;focalLength: number;
-&ensp;sensorWidth: number;
-&ensp;sensorHeight: number;
-&ensp;principalPointX: number;
-&ensp;principalPointY: number;
-}
-&gt;</pre>
+&emsp;focalLength: number;
+&emsp;sensorWidth: number;
+&emsp;sensorHeight: number;
+&emsp;principalPointX: number;
+&emsp;principalPointY: number;
+}&gt;</code>
 
 --------------------
 
