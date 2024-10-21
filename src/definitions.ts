@@ -6,6 +6,12 @@ export interface IntrinsicParameters {
   principalPointX: number;
   principalPointY: number;
 }
+
+export interface ExtrinsicParameters {
+  rotationMatrix: number[];
+  translationVector: number[];
+}
+
 export interface cameraParametersPlugin {
   echo(options: { value: string }): Promise<{ value: string }>;
 }

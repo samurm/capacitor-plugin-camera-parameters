@@ -12,6 +12,19 @@ import com.getcapacitor.Plugin;
 import com.getcapacitor.PluginCall;
 import com.getcapacitor.PluginMethod;
 import com.getcapacitor.annotation.CapacitorPlugin;
+import com.getcapacitor.annotation.Permission;
+import com.getcapacitor.annotation.PermissionCallback;
+
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
+import android.location.Location;
+import android.location.LocationManager;
+import androidx.core.app.ActivityCompat;
+import android.Manifest;
+import 	android.content.pm.PackageManager;
+import org.json.JSONArray;
 
 @CapacitorPlugin(name = "cameraParameters")
 public class cameraParametersPlugin extends Plugin {
@@ -50,6 +63,89 @@ public class cameraParametersPlugin extends Plugin {
 
         } catch (CameraAccessException e) {
             call.reject("Failed to access camera", e);
+        } catch (Exception e) {
+            call.reject("An error occurred", e);
+        }
+    }
+
+    private SensorManager sensorManager;
+    private LocationManager locationManager;
+    private float[] rotationMatrix = new float[9];
+    private float[] translationVector = new float[3];
+
+    @Override
+    public void load() {
+        super.load();
+        sensorManager = (SensorManager) getContext().getSystemService(Context.SENSOR_SERVICE);
+        locationManager = (LocationManager) getContext().getSystemService(Context.LOCATION_SERVICE);
+
+        // Register sensor listeners for rotation matrix
+        Sensor accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+        Sensor magnetometer = sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
+        Sensor rotationVectorSensor = sensorManager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR);
+
+        SensorEventListener sensorEventListener = new SensorEventListener() {
+            float[] gravity;
+            float[] geomagnetic;
+
+            @Override
+            public void onSensorChanged(SensorEvent event) {
+                Log.i("TODO: ", String.valueOf(event.sensor.getType()));
+                if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
+                    gravity = event.values;
+                } else if (event.sensor.getType() == Sensor.TYPE_MAGNETIC_FIELD) {
+                    geomagnetic = event.values;
+                } else if (event.sensor.getType() == Sensor.TYPE_ROTATION_VECTOR) {
+                    SensorManager.getRotationMatrixFromVector(rotationMatrix, event.values);
+                }
+                if (gravity != null && geomagnetic != null) {
+                    SensorManager.getRotationMatrix(rotationMatrix, null, gravity, geomagnetic);
+                }
+            }
+
+            @Override
+            public void onAccuracyChanged(Sensor sensor, int accuracy) {}
+        };
+
+        sensorManager.registerListener(sensorEventListener, accelerometer, SensorManager.SENSOR_DELAY_UI);
+        sensorManager.registerListener(sensorEventListener, magnetometer, SensorManager.SENSOR_DELAY_UI);
+        sensorManager.registerListener(sensorEventListener, rotationVectorSensor, SensorManager.SENSOR_DELAY_UI);
+    }
+
+    // Method to get camera extrinsic parameters
+    @PluginMethod
+    public void getExtrinsicParameters(PluginCall call) {
+        try {
+            // Get location (translation) if needed
+            if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
+                call.resolve(null);
+            } else {
+                Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+                if (location != null) {
+                    translationVector[0] = (float) location.getLatitude();
+                    translationVector[1] = (float) location.getLongitude();
+                    translationVector[2] = (float) location.getAltitude();
+                }
+
+                // Create a JSON object to return
+                JSObject result = new JSObject();
+
+                JSONArray rotationMatrixArray = new JSONArray();
+                for (float value : rotationMatrix) {
+                    rotationMatrixArray.put(value);
+                }
+                JSONArray translationVectorArray = new JSONArray();
+                for (float value : translationVector) {
+                    translationVectorArray.put(value);
+                }
+
+                result.put("rotationMatrix", rotationMatrixArray);
+                result.put("translationVector", translationVectorArray);
+
+                // Send the result back to the JS side
+                call.resolve(result);
+            }
         } catch (Exception e) {
             call.reject("An error occurred", e);
         }

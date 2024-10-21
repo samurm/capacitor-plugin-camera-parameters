@@ -25,12 +25,28 @@
             <div>{{ computeIntrinsicMatrixData[1] }}</div>
             <div>{{ computeIntrinsicMatrixData[2] }}</div>
           </div>
-          <div v-else>
-            Intrinsic matrix not found
-          </div>
+          <div v-else>Intrinsic matrix not found</div>
         </template>
         <div v-else>
           <strong>Intrinsic params not found</strong>
+        </div>
+
+        <template v-if="extrinsicParamsData && Object.keys(extrinsicParamsData).length">
+          <strong>Extrinsic params:</strong>
+          <div>{{ extrinsicParamsData }}</div>
+          <div v-for="(extrinsicParam, index) of Object.keys(extrinsicParamsData)" :key="index">
+            {{ extrinsicParam + ': ' + extrinsicParamsData[extrinsicParam as keyof ExtrinsicParameters] }}
+          </div>
+          <div class="ion-margin" v-if="computeExtrinsicMatrixData">
+            <strong>Extrinsic matrix:</strong>
+            <div>{{ computeExtrinsicMatrixData[0] }}</div>
+            <div>{{ computeExtrinsicMatrixData[1] }}</div>
+            <div>{{ computeExtrinsicMatrixData[2] }}</div>
+          </div>
+          <div v-else>Extrinsic matrix not found</div>
+        </template>
+        <div v-else>
+          <strong>Extrinsic params not found</strong>
         </div>
       </div>
     </ion-content>
@@ -40,19 +56,29 @@
 <script setup lang="ts">
 import { IonContent, IonHeader, IonPage, IonTitle, IonToolbar } from '@ionic/vue';
 import { onMounted, Ref, ref } from 'vue';
-import { cameraParameters, IntrinsicParameters } from 'capacitor-plugin-camera-parameters';
+import { cameraParameters, IntrinsicParameters, ExtrinsicParameters } from 'capacitor-plugin-camera-parameters';
 
 const intrinsicParamsData: Ref<IntrinsicParameters | undefined> = ref();
+const extrinsicParamsData: Ref<ExtrinsicParameters | undefined> = ref();
 const computeIntrinsicMatrixData = ref();
+const computeExtrinsicMatrixData = ref();
 
 onMounted(async () => {
   try {
-      const intrinsicParams = await cameraParameters.getIntrinsicParameters();
-      intrinsicParamsData.value = intrinsicParams;
-      computeIntrinsicMatrixData.value = computeIntrinsicMatrix();
-    } catch (error) {
-      console.error('TODO: Error retrieving intrinsic parameters:', error);
-    }
+    const intrinsicParams = await cameraParameters.getIntrinsicParameters();
+    intrinsicParamsData.value = intrinsicParams;
+    computeIntrinsicMatrixData.value = computeIntrinsicMatrix();
+  } catch (error) {
+    console.error('TODO: Error retrieving intrinsic parameters:', error);
+  }
+
+  try {
+    const extrinsicParams = await cameraParameters.getExtrinsicParameters();
+    extrinsicParamsData.value = extrinsicParams;
+    computeExtrinsicMatrixData.value = computeExtrinsicMatrix();
+  } catch (error) {
+    console.error('TODO: Error retrieving extrinsic parameters:', error);
+  }
 });
 
 function computeIntrinsicMatrix() {
@@ -60,8 +86,8 @@ function computeIntrinsicMatrix() {
     const { focalLength, sensorWidth, sensorHeight } = intrinsicParamsData.value;
 
     // Assuming you have the image resolution
-    const imageWidth = 1280/* Image width in pixels */
-    const imageHeight = 720/* Image height in pixels */
+    const imageWidth = 1280; /* Image width in pixels */
+    const imageHeight = 720; /* Image height in pixels */
 
     const fx = (focalLength * imageWidth) / sensorWidth;
     const fy = (focalLength * imageHeight) / sensorHeight;
@@ -69,12 +95,28 @@ function computeIntrinsicMatrix() {
     const cy = imageHeight / 2;
 
     const intrinsicMatrix = [
-      [fx, 0,  cx],
-      [0,  fy, cy],
-      [0,  0,  1],
+      [fx, 0, cx],
+      [0, fy, cy],
+      [0, 0, 1],
     ];
 
     return intrinsicMatrix;
+  } else {
+    return undefined;
+  }
+}
+
+function computeExtrinsicMatrix() {
+  if (extrinsicParamsData.value) {
+    const { rotationMatrix, translationVector } = extrinsicParamsData.value;
+
+    const extrinsicMatrix = [
+      [rotationMatrix[0], rotationMatrix[1], rotationMatrix[2], translationVector[0]],
+      [rotationMatrix[3], rotationMatrix[4], rotationMatrix[5], translationVector[1]],
+      [rotationMatrix[6], rotationMatrix[7], rotationMatrix[8], translationVector[2]],
+    ];
+
+    return extrinsicMatrix;
   } else {
     return undefined;
   }
@@ -84,7 +126,7 @@ function computeIntrinsicMatrix() {
 <style scoped>
 #container {
   text-align: center;
-  
+
   position: absolute;
   left: 0;
   right: 0;
@@ -100,9 +142,9 @@ function computeIntrinsicMatrix() {
 #container p {
   font-size: 16px;
   line-height: 22px;
-  
+
   color: #8c8c8c;
-  
+
   margin: 0;
 }
 

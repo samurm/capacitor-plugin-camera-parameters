@@ -4,6 +4,8 @@
 <dict>
 	<key>NSCameraUsageDescription</key>
 	<string>Permissions to get intrinsic params</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Permissions to get extrinsic params</string>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
 	<key>CFBundleDisplayName</key>
