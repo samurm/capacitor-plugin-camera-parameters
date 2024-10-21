@@ -13,24 +13,42 @@ npx cap sync
 
 <docgen-index>
 
-* [`echo(...)`](#echo)
+* [`getIntrinsicParameters(...)`](#getIntrinsicParameters)
+* [`getExtrinsicParameters(...)`](#getExtrinsicParameters)
 
 </docgen-index>
 
 <docgen-api>
 <!--Update the source file JSDoc comments and rerun docgen to update the docs below-->
 
-### echo(...)
+### getIntrinsicParameters(...)
 
 ```typescript
-echo(options: { value: string; }) => Promise<{ value: string; }>
+getIntrinsicParameters() => Promise<IntrinsicParameters>
 ```
 
-| Param         | Type                            |
-| ------------- | ------------------------------- |
-| **`options`** | <code>{ value: string; }</code> |
+**Returns:**
+<pre>
+Promise&lt;{ 
+&emsp;focalLength: number;
+&emsp;sensorWidth: number;
+&emsp;sensorHeight: number;
+&emsp;principalPointX: number;
+&emsp;principalPointY: number;
+}&gt;</pre>
 
-**Returns:** <code>Promise&lt;{ value: string; }&gt;</code>
+### getExtrinsicParameters(...)
+
+```typescript
+getExtrinsicParameters() => Promise<ExtrinsicParameters>
+```
+
+**Returns:**
+<pre>
+Promise&lt;{ 
+&emsp;translationVector: number[];
+&emsp;rotationMatrix: number[];
+}&gt;</pre>
 
 --------------------
 
