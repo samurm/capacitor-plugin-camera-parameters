@@ -19,10 +19,10 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/samurm/camera-parameters.git"
+    "url": "git+https://github.com/samurm/capacitor-plugin-camera-parameters.git"
   },
   "bugs": {
-    "url": "https://github.com/samurm/camera-parameters/issues"
+    "url": "https://github.com/samurm/capacitor-plugin-camera-parameters/issues"
   },
   "keywords": [
     "capacitor",
