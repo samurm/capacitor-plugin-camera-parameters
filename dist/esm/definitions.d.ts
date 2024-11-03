@@ -15,4 +15,10 @@ export interface cameraParametersPlugin {
     }): Promise<{
         value: string;
     }>;
+    getIntrinsicParameters(): Promise<{
+        value: any;
+    }>;
+    getExtrinsicParameters(): Promise<{
+        value: any;
+    }>;
 }

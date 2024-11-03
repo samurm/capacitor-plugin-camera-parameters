@@ -9,6 +9,12 @@ var capacitorcameraParameters = (function (exports, core) {
         async echo(options) {
             return options;
         }
+        async getIntrinsicParameters() {
+            return {};
+        }
+        async getExtrinsicParameters() {
+            return {};
+        }
     }
 
     var web = /*#__PURE__*/Object.freeze({
