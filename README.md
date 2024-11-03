@@ -40,10 +40,10 @@ echo(options: { value: string; }) => Promise<{ value: string; }>
 ### getIntrinsicParameters()
 
 ```typescript
-getIntrinsicParameters() => Promise<{ value: any; }>
+getIntrinsicParameters() => Promise<any>
 ```
 
-**Returns:** <code>Promise&lt;{ value: any; }&gt;</code>
+**Returns:** <code>Promise&lt;any&gt;</code>
 
 --------------------
 
@@ -51,10 +51,10 @@ getIntrinsicParameters() => Promise<{ value: any; }>
 ### getExtrinsicParameters()
 
 ```typescript
-getExtrinsicParameters() => Promise<{ value: any; }>
+getExtrinsicParameters() => Promise<any>
 ```
 
-**Returns:** <code>Promise&lt;{ value: any; }&gt;</code>
+**Returns:** <code>Promise&lt;any&gt;</code>
 
 --------------------
 

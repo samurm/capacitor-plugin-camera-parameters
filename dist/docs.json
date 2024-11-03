@@ -23,9 +23,9 @@
       },
       {
         "name": "getIntrinsicParameters",
-        "signature": "() => Promise<{ value: any; }>",
+        "signature": "() => Promise<any>",
         "parameters": [],
-        "returns": "Promise<{ value: any; }>",
+        "returns": "Promise<any>",
         "tags": [],
         "docs": "",
         "complexTypes": [],
@@ -33,9 +33,9 @@
       },
       {
         "name": "getExtrinsicParameters",
-        "signature": "() => Promise<{ value: any; }>",
+        "signature": "() => Promise<any>",
         "parameters": [],
-        "returns": "Promise<{ value: any; }>",
+        "returns": "Promise<any>",
         "tags": [],
         "docs": "",
         "complexTypes": [],
