@@ -7,11 +7,11 @@ export class cameraParametersWeb extends WebPlugin implements cameraParametersPl
     return options;
   }
 
-  async getIntrinsicParameters(): Promise<{ value: any }> {
+  async getIntrinsicParameters(): Promise<any> {
     return {} as any;
   }
 
-  async getExtrinsicParameters(): Promise<{ value: any }> {
+  async getExtrinsicParameters(): Promise<any> {
     return {} as any;
   }
 }
