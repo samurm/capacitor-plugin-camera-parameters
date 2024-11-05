@@ -24,6 +24,12 @@ public class cameraParametersPlugin: CAPPlugin, CAPBridgedPlugin, CLLocationMana
     private var rotationMatrix = [Double](repeating: 0.0, count: 9)
     private var translationVector = [Double](repeating: 0.0, count: 3)
 
+    override public func load() {
+        locationManager.delegate = self
+        locationManager.requestWhenInUseAuthorization()
+        startSensors()
+    }
+
     @objc func getIntrinsicParameters(_ call: CAPPluginCall) {
         guard let cameraPosition = call.getString("position"), (cameraPosition == "front" || cameraPosition == "back") else {
             call.reject("Parameter 'position' is required and should be either 'front' or 'back'")
