@@ -23,28 +23,106 @@
       },
       {
         "name": "getIntrinsicParameters",
-        "signature": "() => Promise<any>",
-        "parameters": [],
-        "returns": "Promise<any>",
+        "signature": "(options: { position: 'front' | 'back'; }) => Promise<IntrinsicParameters>",
+        "parameters": [
+          {
+            "name": "options",
+            "docs": "",
+            "type": "{ position: 'front' | 'back'; }"
+          }
+        ],
+        "returns": "Promise<IntrinsicParameters>",
         "tags": [],
         "docs": "",
-        "complexTypes": [],
+        "complexTypes": [
+          "IntrinsicParameters"
+        ],
         "slug": "getintrinsicparameters"
       },
       {
         "name": "getExtrinsicParameters",
-        "signature": "() => Promise<any>",
+        "signature": "() => Promise<ExtrinsicParameters>",
         "parameters": [],
-        "returns": "Promise<any>",
+        "returns": "Promise<ExtrinsicParameters>",
         "tags": [],
         "docs": "",
-        "complexTypes": [],
+        "complexTypes": [
+          "ExtrinsicParameters"
+        ],
         "slug": "getextrinsicparameters"
       }
     ],
     "properties": []
   },
-  "interfaces": [],
+  "interfaces": [
+    {
+      "name": "IntrinsicParameters",
+      "slug": "intrinsicparameters",
+      "docs": "",
+      "tags": [],
+      "methods": [],
+      "properties": [
+        {
+          "name": "focalLength",
+          "tags": [],
+          "docs": "",
+          "complexTypes": [],
+          "type": "number"
+        },
+        {
+          "name": "sensorWidth",
+          "tags": [],
+          "docs": "",
+          "complexTypes": [],
+          "type": "number"
+        },
+        {
+          "name": "sensorHeight",
+          "tags": [],
+          "docs": "",
+          "complexTypes": [],
+          "type": "number"
+        },
+        {
+          "name": "principalPointX",
+          "tags": [],
+          "docs": "",
+          "complexTypes": [],
+          "type": "number"
+        },
+        {
+          "name": "principalPointY",
+          "tags": [],
+          "docs": "",
+          "complexTypes": [],
+          "type": "number"
+        }
+      ]
+    },
+    {
+      "name": "ExtrinsicParameters",
+      "slug": "extrinsicparameters",
+      "docs": "",
+      "tags": [],
+      "methods": [],
+      "properties": [
+        {
+          "name": "rotationMatrix",
+          "tags": [],
+          "docs": "",
+          "complexTypes": [],
+          "type": "number[]"
+        },
+        {
+          "name": "translationVector",
+          "tags": [],
+          "docs": "",
+          "complexTypes": [],
+          "type": "number[]"
+        }
+      ]
+    }
+  ],
   "enums": [],
   "typeAliases": [],
   "pluginConfigs": []

@@ -3,7 +3,8 @@ export class cameraParametersWeb extends WebPlugin {
     async echo(options) {
         return options;
     }
-    async getIntrinsicParameters() {
+    async getIntrinsicParameters(options) {
+        console.log(options.position);
         return {};
     }
     async getExtrinsicParameters() {

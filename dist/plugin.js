@@ -9,7 +9,8 @@ var capacitorcameraParameters = (function (exports, core) {
         async echo(options) {
             return options;
         }
-        async getIntrinsicParameters() {
+        async getIntrinsicParameters(options) {
+            console.log(options.position);
             return {};
         }
         async getExtrinsicParameters() {

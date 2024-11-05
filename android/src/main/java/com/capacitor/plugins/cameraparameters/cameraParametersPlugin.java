@@ -25,6 +25,7 @@ import androidx.core.app.ActivityCompat;
 import android.Manifest;
 import 	android.content.pm.PackageManager;
 import org.json.JSONArray;
+import org.json.JSONException;
 
 @CapacitorPlugin(name = "cameraParameters")
 public class cameraParametersPlugin extends Plugin {
@@ -33,10 +34,34 @@ public class cameraParametersPlugin extends Plugin {
 
     @PluginMethod
     public void getIntrinsicParameters(PluginCall call) {
+        String cameraPosition = call.getString("position");
+
+        if (cameraPosition == null || (!cameraPosition.equals("front") && !cameraPosition.equals("back"))) {
+            call.reject("Parameter 'position' is required and should be either 'front' or 'back'");
+            return;
+        }
+
         CameraManager manager = (CameraManager) getContext().getSystemService(Context.CAMERA_SERVICE);
         try {
-            String cameraId = manager.getCameraIdList()[0]; // Assuming rear camera
-            CameraCharacteristics characteristics = manager.getCameraCharacteristics(cameraId);
+            String selectedCameraId = null;
+
+            for (String cameraId : manager.getCameraIdList()) {
+                CameraCharacteristics characteristics = manager.getCameraCharacteristics(cameraId);
+                Integer lensFacing = characteristics.get(CameraCharacteristics.LENS_FACING);
+    
+                if ((cameraPosition.equals("front") && lensFacing != null && lensFacing == CameraCharacteristics.LENS_FACING_FRONT) ||
+                    (cameraPosition.equals("back") && lensFacing != null && lensFacing == CameraCharacteristics.LENS_FACING_BACK)) {
+                    selectedCameraId = cameraId;
+                    break;
+                }
+            }
+
+            if (selectedCameraId == null) {
+                call.reject("No " + cameraPosition + " camera found");
+                return;
+            }
+
+            CameraCharacteristics characteristics = manager.getCameraCharacteristics(selectedCameraId);
 
             // Focal Length in millimeters
             float[] focalLengths = characteristics.get(CameraCharacteristics.LENS_INFO_AVAILABLE_FOCAL_LENGTHS);
@@ -82,7 +107,7 @@ public class cameraParametersPlugin extends Plugin {
         // Register sensor listeners for rotation matrix
         Sensor accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
         Sensor magnetometer = sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
-        Sensor rotationVectorSensor = sensorManager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR);
+        // Sensor rotationVectorSensor = sensorManager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR);
 
         SensorEventListener sensorEventListener = new SensorEventListener() {
             float[] gravity;
@@ -90,16 +115,30 @@ public class cameraParametersPlugin extends Plugin {
 
             @Override
             public void onSensorChanged(SensorEvent event) {
-                Log.i("TODO: ", String.valueOf(event.sensor.getType()));
                 if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
                     gravity = event.values;
                 } else if (event.sensor.getType() == Sensor.TYPE_MAGNETIC_FIELD) {
                     geomagnetic = event.values;
-                } else if (event.sensor.getType() == Sensor.TYPE_ROTATION_VECTOR) {
+                } /*else if (event.sensor.getType() == Sensor.TYPE_ROTATION_VECTOR) {
                     SensorManager.getRotationMatrixFromVector(rotationMatrix, event.values);
-                }
+                } */
                 if (gravity != null && geomagnetic != null) {
                     SensorManager.getRotationMatrix(rotationMatrix, null, gravity, geomagnetic);
+
+                    // Emit the event to the JS side
+                    JSObject data = new JSObject();
+                    JSONArray rotationMatrixArray = new JSONArray();
+                    for (float value : rotationMatrix) {
+                        try {
+                            rotationMatrixArray.put(value);
+                        } catch (JSONException e) {
+                            throw new RuntimeException(e);
+                        }
+                    }
+                    data.put("rotationMatrix", rotationMatrixArray);
+
+                    // Emit the event to listeners in JS
+                    notifyListeners("rotationMatrixUpdate", data);
                 }
             }
 
@@ -109,7 +148,7 @@ public class cameraParametersPlugin extends Plugin {
 
         sensorManager.registerListener(sensorEventListener, accelerometer, SensorManager.SENSOR_DELAY_UI);
         sensorManager.registerListener(sensorEventListener, magnetometer, SensorManager.SENSOR_DELAY_UI);
-        sensorManager.registerListener(sensorEventListener, rotationVectorSensor, SensorManager.SENSOR_DELAY_UI);
+        // sensorManager.registerListener(sensorEventListener, rotationVectorSensor, SensorManager.SENSOR_DELAY_UI);
     }
 
     // Method to get camera extrinsic parameters

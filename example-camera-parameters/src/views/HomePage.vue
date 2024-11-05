@@ -33,7 +33,6 @@
 
         <template v-if="extrinsicParamsData && Object.keys(extrinsicParamsData).length">
           <strong>Extrinsic params:</strong>
-          <div>{{ extrinsicParamsData }}</div>
           <div v-for="(extrinsicParam, index) of Object.keys(extrinsicParamsData)" :key="index">
             {{ extrinsicParam + ': ' + extrinsicParamsData[extrinsicParam as keyof ExtrinsicParameters] }}
           </div>
@@ -65,8 +64,10 @@ const computeExtrinsicMatrixData = ref();
 
 onMounted(async () => {
   try {
-    const intrinsicParams = await cameraParameters.getIntrinsicParameters();
+    const intrinsicParams = await cameraParameters.getIntrinsicParameters({ position: "back" });
     intrinsicParamsData.value = intrinsicParams;
+    console.log('TODO: back ', JSON.stringify(intrinsicParams));
+    console.log('TODO: front ', JSON.stringify(await cameraParameters.getIntrinsicParameters({ position: "front" })));
     computeIntrinsicMatrixData.value = computeIntrinsicMatrix();
   } catch (error) {
     console.error('TODO: Error retrieving intrinsic parameters:', error);
@@ -79,6 +80,12 @@ onMounted(async () => {
   } catch (error) {
     console.error('TODO: Error retrieving extrinsic parameters:', error);
   }
+
+  cameraParameters.addListener('rotationMatrixUpdated', (event) => {
+    // extrinsicParamsData.value = event.rotationMatrix;
+    // computeExtrinsicMatrixData.value = computeExtrinsicMatrix();
+    console.log('TODO: 0 Rotation Matrix Updated:', event.rotationMatrix);
+  });
 });
 
 function computeIntrinsicMatrix() {

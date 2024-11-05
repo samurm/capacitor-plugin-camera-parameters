@@ -15,6 +15,8 @@ export interface cameraParametersPlugin {
     }): Promise<{
         value: string;
     }>;
-    getIntrinsicParameters(): Promise<any>;
-    getExtrinsicParameters(): Promise<any>;
+    getIntrinsicParameters(options: {
+        position: 'front' | 'back';
+    }): Promise<IntrinsicParameters>;
+    getExtrinsicParameters(): Promise<ExtrinsicParameters>;
 }

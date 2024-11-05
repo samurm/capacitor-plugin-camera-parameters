@@ -14,8 +14,9 @@ npx cap sync
 <docgen-index>
 
 * [`echo(...)`](#echo)
-* [`getIntrinsicParameters()`](#getintrinsicparameters)
+* [`getIntrinsicParameters(...)`](#getintrinsicparameters)
 * [`getExtrinsicParameters()`](#getextrinsicparameters)
+* [Interfaces](#interfaces)
 
 </docgen-index>
 
@@ -37,13 +38,17 @@ echo(options: { value: string; }) => Promise<{ value: string; }>
 --------------------
 
 
-### getIntrinsicParameters()
+### getIntrinsicParameters(...)
 
 ```typescript
-getIntrinsicParameters() => Promise<any>
+getIntrinsicParameters(options: { position: 'front' | 'back'; }) => Promise<IntrinsicParameters>
 ```
 
-**Returns:** <code>Promise&lt;any&gt;</code>
+| Param         | Type                                          |
+| ------------- | --------------------------------------------- |
+| **`options`** | <code>{ position: 'front' \| 'back'; }</code> |
+
+**Returns:** <code>Promise&lt;<a href="#intrinsicparameters">IntrinsicParameters</a>&gt;</code>
 
 --------------------
 
@@ -51,11 +56,33 @@ getIntrinsicParameters() => Promise<any>
 ### getExtrinsicParameters()
 
 ```typescript
-getExtrinsicParameters() => Promise<any>
+getExtrinsicParameters() => Promise<ExtrinsicParameters>
 ```
 
-**Returns:** <code>Promise&lt;any&gt;</code>
+**Returns:** <code>Promise&lt;<a href="#extrinsicparameters">ExtrinsicParameters</a>&gt;</code>
 
 --------------------
+
+
+### Interfaces
+
+
+#### IntrinsicParameters
+
+| Prop                  | Type                |
+| --------------------- | ------------------- |
+| **`focalLength`**     | <code>number</code> |
+| **`sensorWidth`**     | <code>number</code> |
+| **`sensorHeight`**    | <code>number</code> |
+| **`principalPointX`** | <code>number</code> |
+| **`principalPointY`** | <code>number</code> |
+
+
+#### ExtrinsicParameters
+
+| Prop                    | Type                  |
+| ----------------------- | --------------------- |
+| **`rotationMatrix`**    | <code>number[]</code> |
+| **`translationVector`** | <code>number[]</code> |
 
 </docgen-api>
