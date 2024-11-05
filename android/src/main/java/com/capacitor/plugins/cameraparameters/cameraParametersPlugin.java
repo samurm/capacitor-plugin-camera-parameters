@@ -65,12 +65,16 @@ public class cameraParametersPlugin extends Plugin {
 
             // Focal Length in millimeters
             float[] focalLengths = characteristics.get(CameraCharacteristics.LENS_INFO_AVAILABLE_FOCAL_LENGTHS);
-            float focalLength = focalLengths[0];
 
             // Sensor Physical Size in millimeters
             SizeF sensorSize = characteristics.get(CameraCharacteristics.SENSOR_INFO_PHYSICAL_SIZE);
             float sensorWidth = sensorSize.getWidth();
             float sensorHeight = sensorSize.getHeight();
+
+            // Resolución en píxeles
+            Size pixelArraySize = characteristics.get(CameraCharacteristics.SENSOR_INFO_PIXEL_ARRAY_SIZE);
+            int pixelWidth = pixelArraySize.getWidth();
+            int pixelHeight = pixelArraySize.getHeight();
 
             // Principal Point (Assuming center of the sensor)
             float principalPointX = sensorWidth / 2;
@@ -78,9 +82,11 @@ public class cameraParametersPlugin extends Plugin {
 
             // Output the parameters
             JSObject result = new JSObject();
-            result.put("focalLength", focalLength);
+            result.put("focalLength", focalLengths);
             result.put("sensorWidth", sensorWidth);
             result.put("sensorHeight", sensorHeight);
+            result.put("pixelWidth", pixelWidth);
+            result.put("pixelHeight", pixelHeight);
             result.put("principalPointX", principalPointX);
             result.put("principalPointY", principalPointY);
 
