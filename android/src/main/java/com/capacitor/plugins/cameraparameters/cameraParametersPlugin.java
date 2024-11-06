@@ -4,6 +4,7 @@ import android.hardware.camera2.CameraAccessException;
 import android.hardware.camera2.CameraCharacteristics;
 import android.hardware.camera2.CameraManager;
 import android.content.Context;
+import android.util.Size;
 import android.util.SizeF;
 import android.util.Log;
 
