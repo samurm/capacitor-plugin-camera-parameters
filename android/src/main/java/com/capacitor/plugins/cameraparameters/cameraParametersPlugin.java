@@ -80,9 +80,14 @@ public class cameraParametersPlugin extends Plugin {
             float principalPointX = sensorWidth / 2;
             float principalPointY = sensorHeight / 2;
 
+            JSONArray focalLength = new JSONArray();
+            for (float value : focalLengths) {
+                focalLength.put(value);
+            }
+            
             // Output the parameters
             JSObject result = new JSObject();
-            result.put("focalLength", focalLengths);
+            result.put("focalLength", focalLength);
             result.put("sensorWidth", sensorWidth);
             result.put("sensorHeight", sensorHeight);
             result.put("pixelWidth", pixelWidth);
