@@ -65,8 +65,8 @@ public class cameraParametersPlugin: CAPPlugin, CAPBridgedPlugin, CLLocationMana
             let result: [String: Any] = [
                 "focalLength": focalLength,
                 "lensPosition": lensPosition,
-                "sensorWidth": sensorWidth,
-                "sensorHeight": sensorHeight,
+                "pixelWidth": sensorWidth,
+                "pixelHeight": sensorHeight,
                 "principalPointX": principalPointX,
                 "principalPointY": principalPointY
             ]

@@ -3,6 +3,8 @@ export interface IntrinsicParameters {
   focalLength: number;
   sensorWidth: number;
   sensorHeight: number;
+  pixelWidth: number;
+  pixelHeight: number;
   principalPointX: number;
   principalPointY: number;
 }

@@ -74,6 +74,8 @@ getExtrinsicParameters() => Promise<ExtrinsicParameters>
 | **`focalLength`**     | <code>number</code> |
 | **`sensorWidth`**     | <code>number</code> |
 | **`sensorHeight`**    | <code>number</code> |
+| **`pixelWidth`**      | <code>number</code> |
+| **`pixelHeight`**     | <code>number</code> |
 | **`principalPointX`** | <code>number</code> |
 | **`principalPointY`** | <code>number</code> |
 

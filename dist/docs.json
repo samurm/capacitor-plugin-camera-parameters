@@ -84,6 +84,20 @@
           "type": "number"
         },
         {
+          "name": "pixelWidth",
+          "tags": [],
+          "docs": "",
+          "complexTypes": [],
+          "type": "number"
+        },
+        {
+          "name": "pixelHeight",
+          "tags": [],
+          "docs": "",
+          "complexTypes": [],
+          "type": "number"
+        },
+        {
           "name": "principalPointX",
           "tags": [],
           "docs": "",
