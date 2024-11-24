@@ -77,6 +77,8 @@ public class cameraParametersPlugin extends Plugin {
             int pixelWidth = pixelArraySize.getWidth();
             int pixelHeight = pixelArraySize.getHeight();
 
+            float[] intrinsicCalibration = characteristics.get(CameraCharacteristics.LENS_INTRINSIC_CALIBRATION);
+
             // Principal Point (Assuming center of the sensor)
             float principalPointX = sensorWidth / 2;
             float principalPointY = sensorHeight / 2;
@@ -95,6 +97,7 @@ public class cameraParametersPlugin extends Plugin {
             result.put("pixelHeight", pixelHeight);
             result.put("principalPointX", principalPointX);
             result.put("principalPointY", principalPointY);
+            result.put("intrinsicCalibration", intrinsicCalibration);
 
             call.resolve(result);
 
@@ -119,48 +122,53 @@ public class cameraParametersPlugin extends Plugin {
         // Register sensor listeners for rotation matrix
         Sensor accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
         Sensor magnetometer = sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
-        // Sensor rotationVectorSensor = sensorManager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR);
+        Sensor rotationVectorSensor = sensorManager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR);
 
         SensorEventListener sensorEventListener = new SensorEventListener() {
             float[] gravity;
             float[] geomagnetic;
+            boolean usingRotationVector = false;
 
             @Override
             public void onSensorChanged(SensorEvent event) {
-                if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
+                if (event.sensor.getType() == Sensor.TYPE_ROTATION_VECTOR) {
+                    usingRotationVector = true;
+                    SensorManager.getRotationMatrixFromVector(rotationMatrix, event.values);
+                } else if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
                     gravity = event.values;
                 } else if (event.sensor.getType() == Sensor.TYPE_MAGNETIC_FIELD) {
                     geomagnetic = event.values;
-                } /*else if (event.sensor.getType() == Sensor.TYPE_ROTATION_VECTOR) {
-                    SensorManager.getRotationMatrixFromVector(rotationMatrix, event.values);
-                } */
-                if (gravity != null && geomagnetic != null) {
-                    SensorManager.getRotationMatrix(rotationMatrix, null, gravity, geomagnetic);
-
-                    // Emit the event to the JS side
-                    JSObject data = new JSObject();
-                    JSONArray rotationMatrixArray = new JSONArray();
-                    for (float value : rotationMatrix) {
-                        try {
-                            rotationMatrixArray.put(value);
-                        } catch (JSONException e) {
-                            throw new RuntimeException(e);
-                        }
-                    }
-                    data.put("rotationMatrix", rotationMatrixArray);
-
-                    // Emit the event to listeners in JS
-                    notifyListeners("rotationMatrixUpdate", data);
                 }
+
+                if (!usingRotationVector && gravity != null && geomagnetic != null) {
+                    SensorManager.getRotationMatrix(rotationMatrix, null, gravity, geomagnetic);
+                }
+
+                JSObject data = new JSObject();
+                JSONArray rotationMatrixArray = new JSONArray();
+                for (float value : rotationMatrix) {
+                    try {
+                        rotationMatrixArray.put(value);
+                    } catch (JSONException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+                data.put("rotationMatrix", rotationMatrixArray);
+
+                notifyListeners("rotationMatrixUpdate", data);
             }
 
             @Override
             public void onAccuracyChanged(Sensor sensor, int accuracy) {}
         };
 
-        sensorManager.registerListener(sensorEventListener, accelerometer, SensorManager.SENSOR_DELAY_UI);
-        sensorManager.registerListener(sensorEventListener, magnetometer, SensorManager.SENSOR_DELAY_UI);
-        // sensorManager.registerListener(sensorEventListener, rotationVectorSensor, SensorManager.SENSOR_DELAY_UI);
+        if (rotationVectorSensor != null) {
+            sensorManager.registerListener(sensorEventListener, rotationVectorSensor, SensorManager.SENSOR_DELAY_UI);
+        }
+        if (accelerometer != null && magnetometer != null) {
+            sensorManager.registerListener(sensorEventListener, accelerometer, SensorManager.SENSOR_DELAY_UI);
+            sensorManager.registerListener(sensorEventListener, magnetometer, SensorManager.SENSOR_DELAY_UI);
+        }
     }
 
     // Method to get camera extrinsic parameters
