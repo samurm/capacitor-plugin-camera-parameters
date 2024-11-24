@@ -50,6 +50,30 @@
           "ExtrinsicParameters"
         ],
         "slug": "getextrinsicparameters"
+      },
+      {
+        "name": "addListener",
+        "signature": "(eventName: 'rotationMatrixUpdated', listenerFunc: (event: RotationMatrixEvent) => void) => Promise<PluginListenerHandle>",
+        "parameters": [
+          {
+            "name": "eventName",
+            "docs": "",
+            "type": "'rotationMatrixUpdated'"
+          },
+          {
+            "name": "listenerFunc",
+            "docs": "",
+            "type": "(event: RotationMatrixEvent) => void"
+          }
+        ],
+        "returns": "Promise<PluginListenerHandle>",
+        "tags": [],
+        "docs": "",
+        "complexTypes": [
+          "PluginListenerHandle",
+          "RotationMatrixEvent"
+        ],
+        "slug": "addlistenerrotationmatrixupdated-"
       }
     ],
     "properties": []
@@ -110,6 +134,13 @@
           "docs": "",
           "complexTypes": [],
           "type": "number"
+        },
+        {
+          "name": "intrinsicCalibration",
+          "tags": [],
+          "docs": "",
+          "complexTypes": [],
+          "type": "number[]"
         }
       ]
     },
@@ -129,6 +160,38 @@
         },
         {
           "name": "translationVector",
+          "tags": [],
+          "docs": "",
+          "complexTypes": [],
+          "type": "number[]"
+        }
+      ]
+    },
+    {
+      "name": "PluginListenerHandle",
+      "slug": "pluginlistenerhandle",
+      "docs": "",
+      "tags": [],
+      "methods": [],
+      "properties": [
+        {
+          "name": "remove",
+          "tags": [],
+          "docs": "",
+          "complexTypes": [],
+          "type": "() => Promise<void>"
+        }
+      ]
+    },
+    {
+      "name": "RotationMatrixEvent",
+      "slug": "rotationmatrixevent",
+      "docs": "",
+      "tags": [],
+      "methods": [],
+      "properties": [
+        {
+          "name": "rotationMatrix",
           "tags": [],
           "docs": "",
           "complexTypes": [],

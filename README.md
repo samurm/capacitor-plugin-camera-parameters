@@ -16,6 +16,7 @@ npx cap sync
 * [`echo(...)`](#echo)
 * [`getIntrinsicParameters(...)`](#getintrinsicparameters)
 * [`getExtrinsicParameters()`](#getextrinsicparameters)
+* [`addListener('rotationMatrixUpdated', ...)`](#addlistenerrotationmatrixupdated-)
 * [Interfaces](#interfaces)
 
 </docgen-index>
@@ -64,20 +65,37 @@ getExtrinsicParameters() => Promise<ExtrinsicParameters>
 --------------------
 
 
+### addListener('rotationMatrixUpdated', ...)
+
+```typescript
+addListener(eventName: 'rotationMatrixUpdated', listenerFunc: (event: RotationMatrixEvent) => void) => Promise<PluginListenerHandle>
+```
+
+| Param              | Type                                                                                    |
+| ------------------ | --------------------------------------------------------------------------------------- |
+| **`eventName`**    | <code>'rotationMatrixUpdated'</code>                                                    |
+| **`listenerFunc`** | <code>(event: <a href="#rotationmatrixevent">RotationMatrixEvent</a>) =&gt; void</code> |
+
+**Returns:** <code>Promise&lt;<a href="#pluginlistenerhandle">PluginListenerHandle</a>&gt;</code>
+
+--------------------
+
+
 ### Interfaces
 
 
 #### IntrinsicParameters
 
-| Prop                  | Type                |
-| --------------------- | ------------------- |
-| **`focalLength`**     | <code>number</code> |
-| **`sensorWidth`**     | <code>number</code> |
-| **`sensorHeight`**    | <code>number</code> |
-| **`pixelWidth`**      | <code>number</code> |
-| **`pixelHeight`**     | <code>number</code> |
-| **`principalPointX`** | <code>number</code> |
-| **`principalPointY`** | <code>number</code> |
+| Prop                       | Type                  |
+| -------------------------- | --------------------- |
+| **`focalLength`**          | <code>number</code>   |
+| **`sensorWidth`**          | <code>number</code>   |
+| **`sensorHeight`**         | <code>number</code>   |
+| **`pixelWidth`**           | <code>number</code>   |
+| **`pixelHeight`**          | <code>number</code>   |
+| **`principalPointX`**      | <code>number</code>   |
+| **`principalPointY`**      | <code>number</code>   |
+| **`intrinsicCalibration`** | <code>number[]</code> |
 
 
 #### ExtrinsicParameters
@@ -86,5 +104,19 @@ getExtrinsicParameters() => Promise<ExtrinsicParameters>
 | ----------------------- | --------------------- |
 | **`rotationMatrix`**    | <code>number[]</code> |
 | **`translationVector`** | <code>number[]</code> |
+
+
+#### PluginListenerHandle
+
+| Prop         | Type                                      |
+| ------------ | ----------------------------------------- |
+| **`remove`** | <code>() =&gt; Promise&lt;void&gt;</code> |
+
+
+#### RotationMatrixEvent
+
+| Prop                 | Type                  |
+| -------------------- | --------------------- |
+| **`rotationMatrix`** | <code>number[]</code> |
 
 </docgen-api>

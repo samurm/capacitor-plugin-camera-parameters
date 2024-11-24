@@ -1,3 +1,7 @@
+import type { PluginListenerHandle } from "@capacitor/core";
+export interface RotationMatrixEvent {
+    rotationMatrix: number[];
+}
 export interface IntrinsicParameters {
     focalLength: number;
     sensorWidth: number;
@@ -6,6 +10,7 @@ export interface IntrinsicParameters {
     pixelHeight: number;
     principalPointX: number;
     principalPointY: number;
+    intrinsicCalibration: number[];
 }
 export interface ExtrinsicParameters {
     rotationMatrix: number[];
@@ -21,4 +26,5 @@ export interface cameraParametersPlugin {
         position: 'front' | 'back';
     }): Promise<IntrinsicParameters>;
     getExtrinsicParameters(): Promise<ExtrinsicParameters>;
+    addListener(eventName: 'rotationMatrixUpdated', listenerFunc: (event: RotationMatrixEvent) => void): Promise<PluginListenerHandle>;
 }
