@@ -77,7 +77,10 @@ public class cameraParametersPlugin extends Plugin {
             int pixelWidth = pixelArraySize.getWidth();
             int pixelHeight = pixelArraySize.getHeight();
 
-            float[] intrinsicCalibration = characteristics.get(CameraCharacteristics.LENS_INTRINSIC_CALIBRATION);
+            float[] intrinsicCalibration = null;
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+                intrinsicCalibration = characteristics.get(CameraCharacteristics.LENS_INTRINSIC_CALIBRATION);
+            }
 
             // Principal Point (Assuming center of the sensor)
             float principalPointX = sensorWidth / 2;
@@ -86,6 +89,11 @@ public class cameraParametersPlugin extends Plugin {
             JSONArray focalLength = new JSONArray();
             for (float value : focalLengths) {
                 focalLength.put(value);
+            }
+
+            JSONArray intrinsicCalibrations = new JSONArray();
+            for (float value : intrinsicCalibration) {
+                intrinsicCalibrations.put(value);
             }
             
             // Output the parameters
@@ -97,7 +105,7 @@ public class cameraParametersPlugin extends Plugin {
             result.put("pixelHeight", pixelHeight);
             result.put("principalPointX", principalPointX);
             result.put("principalPointY", principalPointY);
-            result.put("intrinsicCalibration", intrinsicCalibration);
+            result.put("intrinsicCalibration", intrinsicCalibrations);
 
             call.resolve(result);
 
