@@ -90,20 +90,16 @@ onMounted(async () => {
 
 function computeIntrinsicMatrix() {
   if (intrinsicParamsData.value) {
-    const { focalLength, sensorWidth, sensorHeight } = intrinsicParamsData.value;
+    const { intrinsicCalibration } = intrinsicParamsData.value;
 
-    // Assuming you have the image resolution
-    const imageWidth = 1280; /* Image width in pixels */
-    const imageHeight = 720; /* Image height in pixels */
-
-    const fx = (focalLength * imageWidth) / sensorWidth;
+    /*const fx = (focalLength * imageWidth) / sensorWidth;
     const fy = (focalLength * imageHeight) / sensorHeight;
     const cx = imageWidth / 2;
-    const cy = imageHeight / 2;
+    const cy = imageHeight / 2;*/
 
     const intrinsicMatrix = [
-      [fx, 0, cx],
-      [0, fy, cy],
+      [intrinsicCalibration[0], intrinsicCalibration[4], intrinsicCalibration[2]],
+      [0, intrinsicCalibration[1], intrinsicCalibration[3]],
       [0, 0, 1],
     ];
 
