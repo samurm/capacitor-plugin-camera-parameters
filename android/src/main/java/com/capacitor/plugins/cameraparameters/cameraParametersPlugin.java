@@ -1,5 +1,6 @@
 package com.capacitor.plugins.cameraparameters;
-
+import com.google.ar.core.*;
+import com.google.ar.core.exceptions.*;
 import android.hardware.camera2.CameraAccessException;
 import android.hardware.camera2.CameraCharacteristics;
 import android.hardware.camera2.CameraManager;
@@ -77,7 +78,10 @@ public class cameraParametersPlugin extends Plugin {
             int pixelWidth = pixelArraySize.getWidth();
             int pixelHeight = pixelArraySize.getHeight();
 
-            float[] intrinsicCalibration = characteristics.get(CameraCharacteristics.LENS_INTRINSIC_CALIBRATION);
+            float[] intrinsicCalibration = null;
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+                intrinsicCalibration = characteristics.get(CameraCharacteristics.LENS_INTRINSIC_CALIBRATION);
+            }
 
             // Principal Point (Assuming center of the sensor)
             float principalPointX = sensorWidth / 2;
@@ -86,6 +90,11 @@ public class cameraParametersPlugin extends Plugin {
             JSONArray focalLength = new JSONArray();
             for (float value : focalLengths) {
                 focalLength.put(value);
+            }
+
+            JSONArray intrinsicCalibrations = new JSONArray();
+            for (float value : intrinsicCalibration) {
+                intrinsicCalibrations.put(value);
             }
             
             // Output the parameters
@@ -97,7 +106,7 @@ public class cameraParametersPlugin extends Plugin {
             result.put("pixelHeight", pixelHeight);
             result.put("principalPointX", principalPointX);
             result.put("principalPointY", principalPointY);
-            result.put("intrinsicCalibration", intrinsicCalibration);
+            result.put("intrinsicCalibration", intrinsicCalibrations);
 
             call.resolve(result);
 
@@ -112,11 +121,22 @@ public class cameraParametersPlugin extends Plugin {
     private LocationManager locationManager;
     private float[] rotationMatrix = new float[9];
     private float[] translationVector = new float[3];
+    private Session arSession;
 
     @Override
     public void load() {
         super.load();
-        sensorManager = (SensorManager) getContext().getSystemService(Context.SENSOR_SERVICE);
+
+        // Initialize ARCore session
+        try {
+            arSession = new Session(getContext());
+            Config config = new Config(arSession);
+            arSession.configure(config);
+        } catch (UnavailableException e) {
+            Log.e("ARCore", "ARCore is not available or not supported", e);
+        }
+
+        /*sensorManager = (SensorManager) getContext().getSystemService(Context.SENSOR_SERVICE);
         locationManager = (LocationManager) getContext().getSystemService(Context.LOCATION_SERVICE);
 
         // Register sensor listeners for rotation matrix
@@ -168,15 +188,50 @@ public class cameraParametersPlugin extends Plugin {
         if (accelerometer != null && magnetometer != null) {
             sensorManager.registerListener(sensorEventListener, accelerometer, SensorManager.SENSOR_DELAY_UI);
             sensorManager.registerListener(sensorEventListener, magnetometer, SensorManager.SENSOR_DELAY_UI);
-        }
+        }*/
     }
 
     // Method to get camera extrinsic parameters
     @PluginMethod
     public void getExtrinsicParameters(PluginCall call) {
         try {
+            if (arSession == null) {
+                call.reject("ARCore session is not initialized");
+                return;
+            }
+
+            // Obtain current AR frame
+            Frame frame = arSession.update();
+            Pose cameraPose = frame.getCamera().getPose();
+
+            // Get Rotation Matrix
+            float[] rotationMatrix = new float[16];
+            cameraPose.toMatrix(rotationMatrix, 0);
+
+            // Get Translation Vector
+            float[] translationVector = cameraPose.getTranslation();
+
+            // Prepare result
+            JSObject result = new JSObject();
+
+            JSONArray rotationMatrixArray = new JSONArray();
+            for (float value : rotationMatrix) {
+                rotationMatrixArray.put(value);
+            }
+
+            JSONArray translationVectorArray = new JSONArray();
+            for (float value : translationVector) {
+                translationVectorArray.put(value);
+            }
+
+            result.put("rotationMatrix", rotationMatrixArray);
+            result.put("translationVector", translationVectorArray);
+
+            // Send to JS
+            call.resolve(result);
+
             // Get location (translation) if needed
-            if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            /*if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                 ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
                 call.resolve(null);
             } else {
@@ -204,7 +259,7 @@ public class cameraParametersPlugin extends Plugin {
 
                 // Send the result back to the JS side
                 call.resolve(result);
-            }
+            }*/
         } catch (Exception e) {
             call.reject("An error occurred", e);
         }
