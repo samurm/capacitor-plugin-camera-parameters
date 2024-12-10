@@ -20,8 +20,8 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
-import android.location.Location;
-import android.location.LocationManager;
+// import android.location.Location;
+// import android.location.LocationManager;
 import androidx.core.app.ActivityCompat;
 import android.Manifest;
 import 	android.content.pm.PackageManager;
@@ -92,8 +92,10 @@ public class cameraParametersPlugin extends Plugin {
             }
 
             JSONArray intrinsicCalibrations = new JSONArray();
-            for (float value : intrinsicCalibration) {
-                intrinsicCalibrations.put(value);
+            if (intrinsicCalibration != null) {
+                for (float value : intrinsicCalibration) {
+                    intrinsicCalibrations.put(value);
+                }
             }
             
             // Output the parameters
@@ -117,7 +119,7 @@ public class cameraParametersPlugin extends Plugin {
     }
 
     private SensorManager sensorManager;
-    private LocationManager locationManager;
+    // private LocationManager locationManager;
     private float[] rotationMatrix = new float[9];
     private float[] translationVector = new float[3];
 
@@ -125,47 +127,93 @@ public class cameraParametersPlugin extends Plugin {
     public void load() {
         super.load();
         sensorManager = (SensorManager) getContext().getSystemService(Context.SENSOR_SERVICE);
-        locationManager = (LocationManager) getContext().getSystemService(Context.LOCATION_SERVICE);
+        // locationManager = (LocationManager) getContext().getSystemService(Context.LOCATION_SERVICE);
 
         // Register sensor listeners for rotation matrix
         Sensor accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
         Sensor magnetometer = sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
         Sensor rotationVectorSensor = sensorManager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR);
+        Sensor gyroscopeVectorSensor = sensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE);
 
         SensorEventListener sensorEventListener = new SensorEventListener() {
-            float[] gravity;
-            float[] geomagnetic;
-            boolean usingRotationVector = false;
-
+            float[] gravity = null;
+            float[] geomagnetic = null;
+            float[] rotation = null;
+            float[] gyroscope = null;
+    
             @Override
             public void onSensorChanged(SensorEvent event) {
-                if (event.sensor.getType() == Sensor.TYPE_ROTATION_VECTOR) {
-                    usingRotationVector = true;
-                    SensorManager.getRotationMatrixFromVector(rotationMatrix, event.values);
-                } else if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
-                    gravity = event.values;
-                } else if (event.sensor.getType() == Sensor.TYPE_MAGNETIC_FIELD) {
-                    geomagnetic = event.values;
-                }
-
-                if (!usingRotationVector && gravity != null && geomagnetic != null) {
-                    SensorManager.getRotationMatrix(rotationMatrix, null, gravity, geomagnetic);
-                }
-
+                boolean shouldNotify = false;
                 JSObject data = new JSObject();
-                JSONArray rotationMatrixArray = new JSONArray();
-                for (float value : rotationMatrix) {
-                    try {
-                        rotationMatrixArray.put(value);
-                    } catch (JSONException e) {
-                        throw new RuntimeException(e);
-                    }
+    
+                if (event.sensor.getType() == Sensor.TYPE_ROTATION_VECTOR) {
+                    rotation = event.values.clone();
+                    shouldNotify = true;
+                } else if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
+                    gravity = event.values.clone();
+                    shouldNotify = true;
+                } else if (event.sensor.getType() == Sensor.TYPE_MAGNETIC_FIELD) {
+                    geomagnetic = event.values.clone();
+                    shouldNotify = true;
+                } else if (event.sensor.getType() == Sensor.TYPE_GYROSCOPE) {
+                    gyroscope = event.values.clone();
+                    shouldNotify = true;
                 }
-                data.put("rotationMatrix", rotationMatrixArray);
+    
+                if (shouldNotify) {
+                    JSONArray rotationArray = new JSONArray();
+                    JSONArray gravityArray = new JSONArray();
+                    JSONArray geomagneticArray = new JSONArray();
+                    JSONArray gyroscopeArray = new JSONArray();
+    
+                    if (rotation != null) {
+                        for (float value : rotation) {
+                            try {
+                                rotationArray.put(value);
+                            } catch (JSONException e) {
+                                throw new RuntimeException(e);
+                            }
+                        }
+                    }
+    
+                    if (gravity != null) {
+                        for (float value : gravity) {
+                            try {
+                                gravityArray.put(value);
+                            } catch (JSONException e) {
+                                throw new RuntimeException(e);
+                            }
+                        }
+                    }
+    
+                    if (geomagnetic != null) {
+                        for (float value : geomagnetic) {
+                            try {
+                                geomagneticArray.put(value);
+                            } catch (JSONException e) {
+                                throw new RuntimeException(e);
+                            }
+                        }
+                    }
 
-                notifyListeners("rotationMatrixUpdate", data);
+                    if (gyroscope != null) {
+                        for (float value : gyroscope) {
+                            try {
+                                gyroscopeArray.put(value);
+                            } catch (JSONException e) {
+                                throw new RuntimeException(e);
+                            }
+                        }
+                    }
+    
+                    data.put("rotation", rotationArray);
+                    data.put("gravity", gravityArray);
+                    data.put("geomagnetic", geomagneticArray);
+                    data.put("gyroscope", gyroscopeArray);
+                    notifyListeners("rotationMatrixUpdated", data);
+                }
             }
-
+    
             @Override
             public void onAccuracyChanged(Sensor sensor, int accuracy) {}
         };
@@ -173,9 +221,14 @@ public class cameraParametersPlugin extends Plugin {
         if (rotationVectorSensor != null) {
             sensorManager.registerListener(sensorEventListener, rotationVectorSensor, SensorManager.SENSOR_DELAY_UI);
         }
-        if (accelerometer != null && magnetometer != null) {
+        if (accelerometer != null) {
             sensorManager.registerListener(sensorEventListener, accelerometer, SensorManager.SENSOR_DELAY_UI);
+        }
+        if (magnetometer != null) {
             sensorManager.registerListener(sensorEventListener, magnetometer, SensorManager.SENSOR_DELAY_UI);
+        }
+        if (gyroscopeVectorSensor != null) {
+            sensorManager.registerListener(sensorEventListener, gyroscopeVectorSensor, SensorManager.SENSOR_DELAY_UI);
         }
     }
 
@@ -184,35 +237,35 @@ public class cameraParametersPlugin extends Plugin {
     public void getExtrinsicParameters(PluginCall call) {
         try {
             // Get location (translation) if needed
-            if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            /*if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                 ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
                 call.resolve(null);
-            } else {
-                Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-                if (location != null) {
-                    translationVector[0] = (float) location.getLatitude();
-                    translationVector[1] = (float) location.getLongitude();
-                    translationVector[2] = (float) location.getAltitude();
-                }
+            } else {*/
+            /*Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+            if (location != null) {
+                translationVector[0] = (float) location.getLatitude();
+                translationVector[1] = (float) location.getLongitude();
+                translationVector[2] = (float) location.getAltitude();
+            }*/
 
-                // Create a JSON object to return
-                JSObject result = new JSObject();
+            // Create a JSON object to return
+            JSObject result = new JSObject();
 
-                JSONArray rotationMatrixArray = new JSONArray();
-                for (float value : rotationMatrix) {
-                    rotationMatrixArray.put(value);
-                }
-                JSONArray translationVectorArray = new JSONArray();
-                for (float value : translationVector) {
-                    translationVectorArray.put(value);
-                }
+            JSONArray rotationMatrixArray = new JSONArray();
+            /*for (float value : rotationMatrix) {
+                rotationMatrixArray.put(value);
+            }*/
+            /*JSONArray translationVectorArray = new JSONArray();
+            for (float value : translationVector) {
+                translationVectorArray.put(value);
+            }*/
 
-                result.put("rotationMatrix", rotationMatrixArray);
-                result.put("translationVector", translationVectorArray);
+            result.put("rotationMatrix", rotationMatrixArray);
+            // result.put("translationVector", translationVectorArray);
 
-                // Send the result back to the JS side
-                call.resolve(result);
-            }
+            // Send the result back to the JS side
+            call.resolve(result);
+            // }
         } catch (Exception e) {
             call.reject("An error occurred", e);
         }

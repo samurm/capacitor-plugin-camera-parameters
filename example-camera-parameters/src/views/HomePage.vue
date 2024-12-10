@@ -55,10 +55,10 @@
 <script setup lang="ts">
 import { IonContent, IonHeader, IonPage, IonTitle, IonToolbar } from '@ionic/vue';
 import { onMounted, Ref, ref } from 'vue';
-import { cameraParameters, IntrinsicParameters, ExtrinsicParameters } from 'capacitor-plugin-camera-parameters';
+import { cameraParameters, IntrinsicParameters, RotationEvent, ExtrinsicParameters } from 'capacitor-plugin-camera-parameters';
 
 const intrinsicParamsData: Ref<IntrinsicParameters | undefined> = ref();
-const extrinsicParamsData: Ref<ExtrinsicParameters | undefined> = ref();
+const extrinsicParamsData: Ref<RotationEvent | undefined> = ref();
 const computeIntrinsicMatrixData = ref();
 const computeExtrinsicMatrixData = ref();
 
@@ -74,17 +74,31 @@ onMounted(async () => {
   }
 
   try {
-    const extrinsicParams = await cameraParameters.getExtrinsicParameters();
+    /*const extrinsicParams = await cameraParameters.getExtrinsicParameters();
     extrinsicParamsData.value = extrinsicParams;
-    computeExtrinsicMatrixData.value = computeExtrinsicMatrix();
+    computeExtrinsicMatrixData.value = computeExtrinsicMatrix();*/
   } catch (error) {
     console.error('TODO: Error retrieving extrinsic parameters:', error);
   }
 
+  let isProcessing = false; // Flag para evitar múltiples llamadas
+
   cameraParameters.addListener('rotationMatrixUpdated', (event) => {
-    // extrinsicParamsData.value = event.rotationMatrix;
+    if (!isProcessing) { // Solo permite la ejecución si no está en proceso
+        isProcessing = true; // Activar el bloqueo
+
+        setTimeout(() => {
+            // Actualizar valores después de 2 segundos
+            extrinsicParamsData.value = {
+                gravity: event.gravity,
+                rotation: event.rotation,
+                geomagnetic: event.geomagnetic,
+            };
+            console.log('TODO: 0 Rotation Matrix Updated:', event);
+            isProcessing = false; // Desbloquear para permitir futuras ejecuciones
+        }, 1000);
+    }
     // computeExtrinsicMatrixData.value = computeExtrinsicMatrix();
-    console.log('TODO: 0 Rotation Matrix Updated:', event.rotationMatrix);
   });
 });
 

@@ -68,13 +68,13 @@ getExtrinsicParameters() => Promise<ExtrinsicParameters>
 ### addListener('rotationMatrixUpdated', ...)
 
 ```typescript
-addListener(eventName: 'rotationMatrixUpdated', listenerFunc: (event: RotationMatrixEvent) => void) => Promise<PluginListenerHandle>
+addListener(eventName: 'rotationMatrixUpdated', listenerFunc: (event: RotationEvent) => void) => Promise<PluginListenerHandle>
 ```
 
-| Param              | Type                                                                                    |
-| ------------------ | --------------------------------------------------------------------------------------- |
-| **`eventName`**    | <code>'rotationMatrixUpdated'</code>                                                    |
-| **`listenerFunc`** | <code>(event: <a href="#rotationmatrixevent">RotationMatrixEvent</a>) =&gt; void</code> |
+| Param              | Type                                                                        |
+| ------------------ | --------------------------------------------------------------------------- |
+| **`eventName`**    | <code>'rotationMatrixUpdated'</code>                                        |
+| **`listenerFunc`** | <code>(event: <a href="#rotationevent">RotationEvent</a>) =&gt; void</code> |
 
 **Returns:** <code>Promise&lt;<a href="#pluginlistenerhandle">PluginListenerHandle</a>&gt;</code>
 
@@ -88,7 +88,7 @@ addListener(eventName: 'rotationMatrixUpdated', listenerFunc: (event: RotationMa
 
 | Prop                       | Type                  |
 | -------------------------- | --------------------- |
-| **`focalLength`**          | <code>number</code>   |
+| **`focalLength`**          | <code>number[]</code> |
 | **`sensorWidth`**          | <code>number</code>   |
 | **`sensorHeight`**         | <code>number</code>   |
 | **`pixelWidth`**           | <code>number</code>   |
@@ -113,10 +113,13 @@ addListener(eventName: 'rotationMatrixUpdated', listenerFunc: (event: RotationMa
 | **`remove`** | <code>() =&gt; Promise&lt;void&gt;</code> |
 
 
-#### RotationMatrixEvent
+#### RotationEvent
 
-| Prop                 | Type                  |
-| -------------------- | --------------------- |
-| **`rotationMatrix`** | <code>number[]</code> |
+| Prop              | Type                  |
+| ----------------- | --------------------- |
+| **`rotation`**    | <code>number[]</code> |
+| **`gravity`**     | <code>number[]</code> |
+| **`geomagnetic`** | <code>number[]</code> |
+| **`gyroscope`**   | <code>number[]</code> |
 
 </docgen-api>

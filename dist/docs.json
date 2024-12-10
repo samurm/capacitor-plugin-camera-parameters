@@ -53,7 +53,7 @@
       },
       {
         "name": "addListener",
-        "signature": "(eventName: 'rotationMatrixUpdated', listenerFunc: (event: RotationMatrixEvent) => void) => Promise<PluginListenerHandle>",
+        "signature": "(eventName: 'rotationMatrixUpdated', listenerFunc: (event: RotationEvent) => void) => Promise<PluginListenerHandle>",
         "parameters": [
           {
             "name": "eventName",
@@ -63,7 +63,7 @@
           {
             "name": "listenerFunc",
             "docs": "",
-            "type": "(event: RotationMatrixEvent) => void"
+            "type": "(event: RotationEvent) => void"
           }
         ],
         "returns": "Promise<PluginListenerHandle>",
@@ -71,7 +71,7 @@
         "docs": "",
         "complexTypes": [
           "PluginListenerHandle",
-          "RotationMatrixEvent"
+          "RotationEvent"
         ],
         "slug": "addlistenerrotationmatrixupdated-"
       }
@@ -91,7 +91,7 @@
           "tags": [],
           "docs": "",
           "complexTypes": [],
-          "type": "number"
+          "type": "number[]"
         },
         {
           "name": "sensorWidth",
@@ -126,21 +126,21 @@
           "tags": [],
           "docs": "",
           "complexTypes": [],
-          "type": "number"
+          "type": "number | undefined"
         },
         {
           "name": "principalPointY",
           "tags": [],
           "docs": "",
           "complexTypes": [],
-          "type": "number"
+          "type": "number | undefined"
         },
         {
           "name": "intrinsicCalibration",
           "tags": [],
           "docs": "",
           "complexTypes": [],
-          "type": "number[]"
+          "type": "number[] | undefined"
         }
       ]
     },
@@ -184,18 +184,39 @@
       ]
     },
     {
-      "name": "RotationMatrixEvent",
-      "slug": "rotationmatrixevent",
+      "name": "RotationEvent",
+      "slug": "rotationevent",
       "docs": "",
       "tags": [],
       "methods": [],
       "properties": [
         {
-          "name": "rotationMatrix",
+          "name": "rotation",
           "tags": [],
           "docs": "",
           "complexTypes": [],
-          "type": "number[]"
+          "type": "number[] | undefined"
+        },
+        {
+          "name": "gravity",
+          "tags": [],
+          "docs": "",
+          "complexTypes": [],
+          "type": "number[] | undefined"
+        },
+        {
+          "name": "geomagnetic",
+          "tags": [],
+          "docs": "",
+          "complexTypes": [],
+          "type": "number[] | undefined"
+        },
+        {
+          "name": "gyroscope",
+          "tags": [],
+          "docs": "",
+          "complexTypes": [],
+          "type": "number[] | undefined"
         }
       ]
     }
