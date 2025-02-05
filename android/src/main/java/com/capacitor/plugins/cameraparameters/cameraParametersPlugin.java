@@ -125,110 +125,118 @@ public class cameraParametersPlugin extends Plugin {
 
     @Override
     public void load() {
-        super.load();
-        sensorManager = (SensorManager) getContext().getSystemService(Context.SENSOR_SERVICE);
-        // locationManager = (LocationManager) getContext().getSystemService(Context.LOCATION_SERVICE);
-
-        // Register sensor listeners for rotation matrix
-        Sensor accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-        Sensor magnetometer = sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
-        Sensor rotationVectorSensor = sensorManager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR);
-        Sensor gyroscopeVectorSensor = sensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE);
-
-        SensorEventListener sensorEventListener = new SensorEventListener() {
-            float[] gravity = null;
-            float[] geomagnetic = null;
-            float[] rotation = null;
-            float[] gyroscope = null;
-    
-            @Override
-            public void onSensorChanged(SensorEvent event) {
-                boolean shouldNotify = false;
-                JSObject data = new JSObject();
-    
-                if (event.sensor.getType() == Sensor.TYPE_ROTATION_VECTOR) {
-                    rotation = event.values.clone();
-                    shouldNotify = true;
-                } else if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
-                    gravity = event.values.clone();
-                    shouldNotify = true;
-                } else if (event.sensor.getType() == Sensor.TYPE_MAGNETIC_FIELD) {
-                    geomagnetic = event.values.clone();
-                    shouldNotify = true;
-                } else if (event.sensor.getType() == Sensor.TYPE_GYROSCOPE) {
-                    gyroscope = event.values.clone();
-                    shouldNotify = true;
-                }
-    
-                if (shouldNotify) {
-                    JSONArray rotationArray = new JSONArray();
-                    JSONArray gravityArray = new JSONArray();
-                    JSONArray geomagneticArray = new JSONArray();
-                    JSONArray gyroscopeArray = new JSONArray();
-    
-                    if (rotation != null) {
-                        for (float value : rotation) {
-                            try {
-                                rotationArray.put(value);
-                            } catch (JSONException e) {
-                                throw new RuntimeException(e);
-                            }
-                        }
-                    }
-    
-                    if (gravity != null) {
-                        for (float value : gravity) {
-                            try {
-                                gravityArray.put(value);
-                            } catch (JSONException e) {
-                                throw new RuntimeException(e);
-                            }
-                        }
-                    }
-    
-                    if (geomagnetic != null) {
-                        for (float value : geomagnetic) {
-                            try {
-                                geomagneticArray.put(value);
-                            } catch (JSONException e) {
-                                throw new RuntimeException(e);
-                            }
-                        }
-                    }
-
-                    if (gyroscope != null) {
-                        for (float value : gyroscope) {
-                            try {
-                                gyroscopeArray.put(value);
-                            } catch (JSONException e) {
-                                throw new RuntimeException(e);
-                            }
-                        }
-                    }
-    
-                    data.put("rotation", rotationArray);
-                    data.put("gravity", gravityArray);
-                    data.put("geomagnetic", geomagneticArray);
-                    data.put("gyroscope", gyroscopeArray);
-                    notifyListeners("rotationMatrixUpdated", data);
-                }
+        try {
+            
+            super.load();
+            sensorManager = (SensorManager) getContext().getSystemService(Context.SENSOR_SERVICE);
+            // locationManager = (LocationManager) getContext().getSystemService(Context.LOCATION_SERVICE);
+            
+            if (sensorManager == null) {
+                throw new RuntimeException("SensorManager is null");
             }
-    
-            @Override
-            public void onAccuracyChanged(Sensor sensor, int accuracy) {}
-        };
 
-        if (rotationVectorSensor != null) {
-            sensorManager.registerListener(sensorEventListener, rotationVectorSensor, SensorManager.SENSOR_DELAY_UI);
-        }
-        if (accelerometer != null) {
-            sensorManager.registerListener(sensorEventListener, accelerometer, SensorManager.SENSOR_DELAY_UI);
-        }
-        if (magnetometer != null) {
-            sensorManager.registerListener(sensorEventListener, magnetometer, SensorManager.SENSOR_DELAY_UI);
-        }
-        if (gyroscopeVectorSensor != null) {
-            sensorManager.registerListener(sensorEventListener, gyroscopeVectorSensor, SensorManager.SENSOR_DELAY_UI);
+            // Register sensor listeners for rotation matrix
+            Sensor accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+            Sensor magnetometer = sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
+            Sensor rotationVectorSensor = sensorManager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR);
+            Sensor gyroscopeVectorSensor = sensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE);
+    
+            SensorEventListener sensorEventListener = new SensorEventListener() {
+
+                float[] gravity = null;
+                float[] geomagnetic = null;
+                float[] rotation = null;
+                float[] gyroscope = null;
+        
+                @Override
+                public void onSensorChanged(SensorEvent event) {
+                    try {
+                        boolean shouldNotify = false;
+                        JSObject data = new JSObject();
+            
+                        if (event.sensor.getType() == Sensor.TYPE_ROTATION_VECTOR) {
+                            rotation = event.values.clone();
+                            shouldNotify = true;
+                        } else if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
+                            gravity = event.values.clone();
+                            shouldNotify = true;
+                        } else if (event.sensor.getType() == Sensor.TYPE_MAGNETIC_FIELD) {
+                            geomagnetic = event.values.clone();
+                            shouldNotify = true;
+                        } else if (event.sensor.getType() == Sensor.TYPE_GYROSCOPE) {
+                            gyroscope = event.values.clone();
+                            shouldNotify = true;
+                        }
+            
+                        if (shouldNotify) {
+                            JSONArray rotationArray = new JSONArray();
+                            JSONArray gravityArray = new JSONArray();
+                            JSONArray geomagneticArray = new JSONArray();
+                            JSONArray gyroscopeArray = new JSONArray();
+            
+                            try {
+                                if (rotation != null) {
+                                    for (float value : rotation) {
+                                        rotationArray.put(value);
+                                    }
+                                }
+            
+                                if (gravity != null) {
+                                    for (float value : gravity) {
+                                        gravityArray.put(value);
+                                    }
+                                }
+            
+                                if (geomagnetic != null) {
+                                    for (float value : geomagnetic) {
+                                        geomagneticArray.put(value);
+                                    }
+                                }
+        
+                                if (gyroscope != null) {
+                                    for (float value : gyroscope) {
+                                        gyroscopeArray.put(value);
+                                    }
+                                }
+    
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+            
+                            data.put("rotation", rotationArray);
+                            data.put("gravity", gravityArray);
+                            data.put("geomagnetic", geomagneticArray);
+                            data.put("gyroscope", gyroscopeArray);
+                            notifyListeners("rotationMatrixUpdated", data);
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+        
+                @Override
+                public void onAccuracyChanged(Sensor sensor, int accuracy) {}
+            };
+    
+            try {
+                if (rotationVectorSensor != null) {
+                    sensorManager.registerListener(sensorEventListener, rotationVectorSensor, SensorManager.SENSOR_DELAY_UI);
+                }
+                if (accelerometer != null) {
+                    sensorManager.registerListener(sensorEventListener, accelerometer, SensorManager.SENSOR_DELAY_UI);
+                }
+                if (magnetometer != null) {
+                    sensorManager.registerListener(sensorEventListener, magnetometer, SensorManager.SENSOR_DELAY_UI);
+                }
+                if (gyroscopeVectorSensor != null) {
+                    sensorManager.registerListener(sensorEventListener, gyroscopeVectorSensor, SensorManager.SENSOR_DELAY_UI);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
